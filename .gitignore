@@ -1,0 +1,5 @@
+.idea/*
+golang/kinesis_scaling
+golang/kinesis_scaling.zip
+*/.terraform/**
+.terraform*
