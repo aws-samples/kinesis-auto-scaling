@@ -4,7 +4,7 @@ A lightweight system to automatically scale Kinesis Data Streams up and down bas
 
 This is a production ready solution that has been scaling 1000+ streams in multiple production accounts without issue. 
 
-![Kinesis_Auto_Scaling](/uploads/cf0b26c330988e00c17f01377185303b/Kinesis_Auto_Scaling.png)
+![Kinesis_Auto_Scaling](https://user-images.githubusercontent.com/85569859/121233258-788f3980-c860-11eb-825b-c857ddd13299.png)
 
 # Event Flow 
 - Step 1: Metrics flow from the `Kinesis Data Stream(s)` into `CloudWatch Metrics` (Bytes/Sec, Records/Sec)
