@@ -2,8 +2,6 @@
 
 A lightweight system to automatically scale Kinesis Data Streams up and down based on throughput.
 
-This is a production ready solution that has been scaling 1000+ streams in multiple production accounts without issue. 
-
 ![Kinesis_Auto_Scaling](https://user-images.githubusercontent.com/85569859/121233258-788f3980-c860-11eb-825b-c857ddd13299.png)
 
 # Event Flow 
