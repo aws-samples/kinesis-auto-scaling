@@ -1,0 +1,89 @@
+{
+	"AlarmName": "Kinesis_Auto_Scale_Up_Alarm",
+	"AlarmDescription": "Alarm to scale up Kinesis stream",
+	"AWSAccountId": "111111111111",
+	"NewStateValue": "ALARM",
+	"NewStateReason": "Threshold Crossed: 1 out of the last 1 datapoints [0.43262672424316406 (23/04/20 21:16:00)] was greater than or equal to the threshold (0.4) (minimum 1 datapoint for OK -> ALARM transition).",
+	"StateChangeTime": "2020-04-23T21:17:44.775+0000",
+	"Region": "US East (Ohio)",
+	"AlarmArn": "arn:aws:cloudwatch:us-east-2:111111111111:alarm:Kinesis_Auto_Scale_Up_Alarm",
+	"OldStateValue": "OK",
+	"Trigger": {
+		"Period": 60,
+		"EvaluationPeriods": 1,
+		"ComparisonOperator": "GreaterThanOrEqualToThreshold",
+		"Threshold": 0.4,
+		"TreatMissingData": "- TreatMissingData:                    ignore",
+		"EvaluateLowSampleCountPercentile": "",
+		"Metrics": [
+			{
+				"Id": "m1",
+				"Label": "IncomingBytes",
+				"MetricStat": {
+					"Metric": {
+						"Dimensions": [
+							{
+								"value": "auto-scaling-demo-stream",
+								"name": "StreamName"
+							}
+						],
+						"MetricName": "IncomingBytes",
+						"Namespace": "AWS/Kinesis"
+					},
+					"Period": 60,
+					"Stat": "Sum"
+				},
+				"ReturnData": false
+			},
+			{
+				"Id": "m2",
+				"Label": "IncomingRecords",
+				"MetricStat": {
+					"Metric": {
+						"Dimensions": [
+							{
+								"value": "auto-scaling-demo-stream",
+								"name": "StreamName"
+							}
+						],
+						"MetricName": "IncomingRecords",
+						"Namespace": "AWS/Kinesis"
+					},
+					"Period": 60,
+					"Stat": "Sum"
+				},
+				"ReturnData": false
+			},
+			{
+				"Expression": "FILL(m1,0)",
+				"Id": "e1",
+				"Label": "FillMissingDataPointsWithZeroForIncomingBytes",
+				"ReturnData": false
+			},
+			{
+				"Expression": "FILL(m2,0)",
+				"Id": "e2",
+				"Label": "FillMissingDataPointsWithZeroForIncomingRecords",
+				"ReturnData": false
+			},
+			{
+				"Expression": "e1/(1024*1024*60*1)",
+				"Id": "e3",
+				"Label": "IncomingBytesUsageFactor",
+				"ReturnData": false
+			},
+			{
+				"Expression": "e2/(1000*60*1)",
+				"Id": "e4",
+				"Label": "IncomingRecordsUsageFactor",
+				"ReturnData": false
+			},
+			{
+				"Expression": "MAX([e3,e4])",
+				"Id": "e5",
+				"Label": "ScalingTrigger",
+				"ReturnData": true
+			}
+		]
+	}
+}

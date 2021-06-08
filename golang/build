@@ -1,0 +1,7 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main scale.go
+rm -f kinesis_scaling.zip
+zip kinesis_scaling.zip main
+rm main

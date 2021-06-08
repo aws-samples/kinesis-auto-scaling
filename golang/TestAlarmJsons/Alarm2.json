@@ -1,0 +1,89 @@
+{
+    "AlarmName": "Kinesis_Auto_Scale_Down_Alarm",
+    "AlarmDescription": "Alarm to scale down Kinesis stream",
+    "AWSAccountId": "111111111111",
+    "NewStateValue": "ALARM",
+    "NewStateReason": "Threshold Crossed: 5 out of the last 5 datapoints were less than the threshold (0.25). The most recent datapoints which crossed the threshold: [0.0 (22/05/20 17:28:00), 0.09097101688385009 (22/05/20 17:27:00), 0.21238704919815063 (22/05/20 17:26:00), 0.1440973997116089 (22/05/20 17:25:00), 0.0 (22/05/20 17:24:00)] (minimum 5 datapoints for OK -> ALARM transition).",
+    "StateChangeTime": "2020-05-22T17:29:52.246+0000",
+    "Region": "US East (N. Virginia)",
+    "AlarmArn": "arn:aws:cloudwatch:us-east-1:111111111111:alarm:Kinesis_Auto_Scale_Down_Alarm",
+    "OldStateValue": "INSUFFICIENT_DATA",
+    "Trigger": {
+        "Period": 60,
+        "EvaluationPeriods": 5,
+        "ComparisonOperator": "LessThanThreshold",
+        "Threshold": 0.25,
+        "TreatMissingData": "- TreatMissingData:                    ignore",
+        "EvaluateLowSampleCountPercentile": "",
+        "Metrics": [
+            {
+                "Id": "m1",
+                "Label": "IncomingBytes",
+                "MetricStat": {
+                    "Metric": {
+                        "Dimensions": [
+                            {
+                                "value": "auto-stream-poc",
+                                "name": "StreamName"
+                            }
+                        ],
+                        "MetricName": "IncomingBytes",
+                        "Namespace": "AWS/Kinesis"
+                    },
+                    "Period": 60,
+                    "Stat": "Sum"
+                },
+                "ReturnData": false
+            },
+            {
+                "Id": "m2",
+                "Label": "IncomingRecords",
+                "MetricStat": {
+                    "Metric": {
+                        "Dimensions": [
+                            {
+                                "value": "auto-stream-poc",
+                                "name": "StreamName"
+                            }
+                        ],
+                        "MetricName": "IncomingRecords",
+                        "Namespace": "AWS/Kinesis"
+                    },
+                    "Period": 60,
+                    "Stat": "Sum"
+                },
+                "ReturnData": false
+            },
+            {
+                "Expression": "FILL(m1,0)",
+                "Id": "e1",
+                "Label": "FillMissingDataPointsWithZeroForIncomingBytes",
+                "ReturnData": false
+            },
+            {
+                "Expression": "FILL(m2,0)",
+                "Id": "e2",
+                "Label": "FillMissingDataPointsWithZeroForIncomingRecords",
+                "ReturnData": false
+            },
+            {
+                "Expression": "e2/(1000*4*60)",
+                "Id": "e3",
+                "Label": "IncomingRecordsUsageFactor",
+                "ReturnData": false
+            },
+            {
+                "Expression": "e1/(1048576*4*60)",
+                "Id": "e4",
+                "Label": "IncomingBytesUsageFactor",
+                "ReturnData": false
+            },
+            {
+                "Expression": "MAX([e3,e4])",
+                "Id": "e5",
+                "Label": "IncomingBytesPercent",
+                "ReturnData": true
+            }
+        ]
+    }
+}
