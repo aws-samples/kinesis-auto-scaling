@@ -34,6 +34,11 @@ A lightweight system to automatically scale Kinesis Data Streams up and down bas
 2.	Download `kinesis_scaling.zip` and upload it to your S3 Bucket
 3.	Deploy the `kinesis_scaling_cf.yaml` CloudFormation template and point it to the `kinesis_scaling.zip` file in your S3 Bucket. 
 
+# Testing
+
+To generate traffic on your streams you can use [Kinesis Data Generator](https://aws.amazon.com/blogs/big-data/test-your-streaming-data-solution-with-the-new-amazon-kinesis-data-generator/).
+
+
 # Modifying / Recompiling the Lambda
 
 Simply edit the `scale.go` file as needed and run `./build` to genrate a `kinesis_scaling.zip` suitable for Lambda deployment. Go 1.15.x is recommened.
