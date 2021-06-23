@@ -22,10 +22,6 @@ Parameters:
     Type: String
     Description: S3 filename containing the 'kinesis_scaling.zip' golang Lambda
     Default: kinesis_scaling.zip
-  KinesisScalingFunctionName:
-    Type: String
-    Description: Auto Scaling Lambda function name
-    Default: kinesis-scaling
   KinesisScaleUpThreshold:
     Type: Number
     Description: At what total usage should streams scale up? Handles both bytes/sec and records/sec (1.0 = 100%)
@@ -58,7 +54,7 @@ Resources:
     DependsOn: AutoScalingLambdaRole
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Ref KinesisScalingFunctionName
+      FunctionName: !Sub '${AWS::StackName}-kinesis-scaling'
       Runtime: go1.x
       Role: !GetAtt AutoScalingLambdaRole.Arn
       Handler: main
@@ -89,7 +85,7 @@ Resources:
     Type: AWS::Lambda::EventInvokeConfig
     DependsOn: AutoScalingLambda
     Properties:
-      FunctionName: !Ref KinesisScalingFunctionName
+      FunctionName: !Sub '${AWS::StackName}-kinesis-scaling'
       MaximumRetryAttempts: 0  # We do not want any retries of the scaling function if it errors out, alarms will re-trigger it
       Qualifier: $LATEST
 
@@ -125,7 +121,8 @@ Resources:
                   - 'cloudwatch:ListTagsForResource'
                   - 'cloudwatch:SetAlarmState'
                   - 'cloudwatch:TagResource'
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${AWS::StackName}-AutoScalingStream*'
         - PolicyName: AllowLoggingToCloudWatch
           PolicyDocument:
             Version: "2012-10-17"
@@ -135,7 +132,8 @@ Resources:
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-kinesis-scaling:*'
         - PolicyName: AllowReadFromKinesis
           PolicyDocument:
             Version: "2012-10-17"
@@ -146,7 +144,8 @@ Resources:
                   - 'kinesis:AddTagsToStream'
                   - 'kinesis:ListTagsForStream'
                   - 'kinesis:UpdateShardCount'
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/${AWS::StackName}-AutoScalingStream*'
         - PolicyName: AllowPublishToSNS
           PolicyDocument:
             Version: "2012-10-17"
@@ -154,7 +153,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - 'sns:Publish'
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}-kinesis-scaling-topic'
         - PolicyName: AllowChangeFunctionConcurrencyForLambda
           PolicyDocument:
             Version: "2012-10-17"
@@ -163,7 +163,8 @@ Resources:
                 Action:
                   - 'lambda:PutFunctionConcurrency'
                   - 'lambda:DeleteFunctionConcurrency'
-                Resource: '*'
+                Resource:
+                  - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-your-kinesis-consumer-function-name-here'
 
 
 ###############################################################################
@@ -173,19 +174,19 @@ Resources:
 ###############################################################################
 
   AutoScalingSNSTopic:
-    DependsOn: AutoScalingLambda
     Type: AWS::SNS::Topic
+    DependsOn: AutoScalingLambda
     Properties:
       Subscription:
-        - Endpoint: !GetAtt AutoScalingLambda.Arn
+        - Endpoint: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-kinesis-scaling'
           Protocol: "lambda"
-      TopicName: "kinesis-scaling-topic"
+      TopicName:  !Sub '${AWS::StackName}-kinesis-scaling-topic'
 
   AutoScalingSNSTopicLambdaPerm:
     Type: AWS::Lambda::Permission
     Properties:
       Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref KinesisScalingFunctionName
+      FunctionName: !Sub '${AWS::StackName}-kinesis-scaling'
       Principal: "sns.amazonaws.com"
       SourceArn: !Ref AutoScalingSNSTopic
 
