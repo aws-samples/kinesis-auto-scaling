@@ -22,7 +22,7 @@ A lightweight system to automatically scale Kinesis Data Streams up and down bas
 2. Proven. This system has been battle tested, scaling thousands of production streams without issue.
 3. Suitable for scaling massive amounts of streams. Each additional stream requires only 2 CloudWatch alarms.
 4. Operations friendly. Everything is viewable/editable/debuggable in the console, no need to drop into the CLI to see what's going on.
-5. Takes into account both ingress metrics `Records Per Seconds` and `Bytes Per Seconds` when deciding to scale a stream up or down.
+5. Takes into account both ingress metrics `Records Per Second` and `Bytes Per Second` when deciding to scale a stream up or down.
 6. Can optionally take into account egress needs via `Max Iterator Age` so streams that are N minutes behind (configurable) do not scale down and lose much needed Lambda processing power (Lambdas per Shard) because their shard count was reduced due to a drop in incoming traffic. 
 7. Already designed out the box to work within the 10 UpdateShardCount per rolling 24 hour limit. 
 8. Emits a custom CloudWatch error metric if scaling fails, you can alarm off this for added peace of mind.
