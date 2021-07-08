@@ -340,7 +340,7 @@ func handleRequest(_ context.Context, snsEvent events.SNSEvent) {
 	updateProcessingLambdaConcurrency(newShardCount)
 
 	logger.Info(fmt.Sprintf("Scaling complete for %s", streamName))
-	// Successful exit, shard count has been updated, alarms have been re-calculated and updated.
+	// Successful exit, shard count has been updated, concurrency for the processing lambda has been set accordingly, alarms have been re-calculated and updated.
 }
 
 // UpdateAlarm updates the cloudwatch alarm with an updated shardCount values (parameter newShardCount).
